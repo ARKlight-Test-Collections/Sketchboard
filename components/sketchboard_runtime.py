@@ -30,7 +30,8 @@ class SketchboardRuntime(ScriptExtension):
             elements: [], selectedId: null, selectedIds: [], tool: "selection", stroke: colors.ink,
             fill: "#dbeafe", fillEnabled: false, strokeWidth: 2, strokeStyle: "solid",
             opacity: 1, fontSize: 20, gridVisible: true, snapToGrid: false,
-            background: "#ffffff", zoom: 1, panX: 0, panY: 0, preview: null,
+            background: "#ffffff", sceneName: byId("board-title").value || "Untitled board",
+            zoom: 1, panX: 0, panY: 0, preview: null,
             marquee: null, clipboard: []
         };
         var history = [];
@@ -73,7 +74,8 @@ class SketchboardRuntime(ScriptExtension):
                 stroke: state.stroke, fill: state.fill, fillEnabled: state.fillEnabled,
                 strokeWidth: state.strokeWidth, strokeStyle: state.strokeStyle,
                 opacity: state.opacity, fontSize: state.fontSize,
-                gridVisible: state.gridVisible, snapToGrid: state.snapToGrid
+                gridVisible: state.gridVisible, snapToGrid: state.snapToGrid,
+                sceneName: state.sceneName
             };
         }
 
@@ -85,6 +87,11 @@ class SketchboardRuntime(ScriptExtension):
             byId("line-style").value = state.strokeStyle;
             byId("element-opacity").value = Math.round(state.opacity * 100);
             byId("font-size").value = state.fontSize;
+            var titleInput = byId("board-title");
+            if (titleInput.value !== state.sceneName) {
+                titleInput.value = state.sceneName;
+                titleInput.dispatchEvent(new Event("input", { bubbles: true }));
+            }
             byId("snap-toggle").setAttribute("aria-pressed", state.snapToGrid ? "true" : "false");
             byId("snap-toggle").textContent = state.snapToGrid ? "Snap on" : "Snap off";
             byId("grid-toggle").setAttribute("aria-pressed", state.gridVisible ? "true" : "false");
@@ -106,6 +113,7 @@ class SketchboardRuntime(ScriptExtension):
             state.fontSize = snapshot.fontSize || 20;
             state.gridVisible = snapshot.gridVisible !== false;
             state.snapToGrid = snapshot.snapToGrid === true;
+            state.sceneName = snapshot.sceneName || "Untitled board";
             setSelection([]);
         }
 
@@ -126,6 +134,7 @@ class SketchboardRuntime(ScriptExtension):
                 version: 2,
                 elements: state.elements,
                 appState: {
+                    name: state.sceneName,
                     viewBackgroundColor: state.background,
                     gridVisible: state.gridVisible,
                     snapToGrid: state.snapToGrid,
@@ -192,6 +201,7 @@ class SketchboardRuntime(ScriptExtension):
                 background: background,
                 gridVisible: oldStyle && appState.gridVisible === false ? false : true,
                 snapToGrid: oldStyle && appState.snapToGrid === true,
+                sceneName: String(appState.name || incoming.name || "Untitled board").slice(0, 100),
                 stroke: /^#[0-9a-f]{6}$/i.test(appState.stroke || incoming.stroke || "") ? (appState.stroke || incoming.stroke) : state.stroke,
                 fill: /^#[0-9a-f]{6}$/i.test(appState.fill || incoming.fill || "") ? (appState.fill || incoming.fill) : state.fill,
                 fillEnabled: appState.fillEnabled === true || incoming.fillEnabled === true,
@@ -274,7 +284,7 @@ class SketchboardRuntime(ScriptExtension):
                 version: 2,
                 source: "https://excalidraw.com",
                 elements: elements,
-                appState: { viewBackgroundColor: state.background, gridSize: state.snapToGrid ? 22 : null },
+                appState: { name: state.sceneName, viewBackgroundColor: state.background, gridSize: state.snapToGrid ? 22 : null },
                 files: files
             };
         }
@@ -295,6 +305,7 @@ class SketchboardRuntime(ScriptExtension):
                 var imported = normalizeScene(saved);
                 state.elements = imported.elements;
                 state.background = imported.background;
+                state.sceneName = imported.sceneName;
                 state.gridVisible = imported.gridVisible;
                 state.snapToGrid = imported.snapToGrid;
                 state.stroke = imported.stroke;
@@ -1093,7 +1104,8 @@ class SketchboardRuntime(ScriptExtension):
         }
 
         function exportJson() {
-            download(new Blob([JSON.stringify(exportSceneData(), null, 2)], { type: "application/json" }), "sketchboard.excalidraw");
+            var filename = state.sceneName.trim().replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "") || "sketchboard";
+            download(new Blob([JSON.stringify(exportSceneData(), null, 2)], { type: "application/json" }), filename + ".excalidraw");
         }
 
         function exportPng() {
@@ -1126,6 +1138,7 @@ class SketchboardRuntime(ScriptExtension):
                     var imported = normalizeScene(incoming);
                     state.elements = imported.elements;
                     state.background = imported.background;
+                    state.sceneName = imported.sceneName;
                     state.gridVisible = imported.gridVisible;
                     state.snapToGrid = imported.snapToGrid;
                     state.stroke = imported.stroke;

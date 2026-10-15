@@ -20,6 +20,21 @@ Run `pytest` for compiler/output smoke tests. Keyboard shortcuts include
 `Ctrl/Cmd+Shift+Z`, `Ctrl/Cmd+C/V/D`, `Ctrl/Cmd+A`, `Delete`, `Space`, and
 `Home` provide common editing actions.
 
+## Project layout
+
+- `site.py` creates the `Site`, registers design/runtime setup, and declares routes.
+- `pages/home.py` assembles the page from reusable components.
+- `components/site_design.py` owns site-wide structured styles.
+- `components/header.py`, `toolbar.py`, `properties_panel.py`, `canvas_stage.py`,
+	`status_bar.py`, and `shortcuts_panel.py` each own one UI region.
+- `components/sketchboard_runtime.py` contains the isolated experimental canvas
+	runtime; `content/` owns copy and metadata; `assets/` owns local files.
+
+The stable ARKlight API manages the persisted scene name (`State`/`Bind.model`),
+its derived display label (`Computed`), and the shortcut panel (`Action`/`Show`).
+Only pointer events, canvas rendering, and browser file operations use
+`ScriptExtension`.
+
 ## ARKlight boundary
 
 The page, controls, layout, and stylesheet use ARKlight's stable component
@@ -32,4 +47,5 @@ The app imports and exports the supported subset of Excalidraw's version-2
 scene format. It is not a complete Excalidraw port: collaboration, libraries,
 crop editing, alignment/distribution, and unsupported element types are not
 implemented. Images are embedded as data URLs, so large scenes can exceed
-browser localStorage quotas; JSON export is the durable backup path.
+browser localStorage quotas; JSON export is the durable backup path. For the
+project structure rationale, run `arklight new --explain-architecture`.

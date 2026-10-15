@@ -37,6 +37,14 @@ def test_board_shell_has_tool_dock_and_main_landmark(built):
     assert "<main" in html
 
 
+def test_stable_arklight_state_drives_scene_name_and_help_panel(built):
+    html = (built / "index.html").read_text(encoding="utf-8")
+    assert 'data-ark-model="scene_name"' in html
+    assert 'data-ark-on-click="action:toggle_bool"' in html
+    assert 'data-ark-action-state="show_shortcuts"' in html
+    assert 'data-ark-show=' in html
+
+
 def test_assets_are_copied_into_the_build(built):
     assert (built / "assets" / "icon.svg").exists()
 
