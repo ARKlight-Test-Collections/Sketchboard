@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sketchboard icon">
+  <rect width="512" height="512" rx="96" fill="#27364b"/>
+  <path d="M108 135c42-5 206-3 278 2 7 44 8 154 1 205-82 6-193 7-281 0-6-63-5-152 2-207Z" fill="none" stroke="#f7f8fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/>
+  <path d="M176 330c38-55 80-100 130-145" fill="none" stroke="#f1bd63" stroke-linecap="round" stroke-width="22"/>
+  <path d="m283 182 37-13-8 40" fill="none" stroke="#f1bd63" stroke-linecap="round" stroke-linejoin="round" stroke-width="18"/>
+</svg>
